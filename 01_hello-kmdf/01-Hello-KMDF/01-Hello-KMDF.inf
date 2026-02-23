@@ -1,0 +1,62 @@
+;
+; 01-Hello-KMDF.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = 01-Hello-KMDF.cat
+DriverVer   = ; TODO: set DriverVer in stampinf property pages
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+01-Hello-KMDF.sys  = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%01-Hello-KMDF.DeviceDesc% = 01-Hello-KMDF_Device, Root\01-Hello-KMDF ; TODO: edit hw-id
+
+[01-Hello-KMDF_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+01-Hello-KMDF.sys
+
+;-------------- Service installation
+[01-Hello-KMDF_Device.NT.Services]
+AddService = 01-Hello-KMDF,%SPSVCINST_ASSOCSERVICE%, 01-Hello-KMDF_Service_Inst
+
+; -------------- 01-Hello-KMDF driver install sections
+[01-Hello-KMDF_Service_Inst]
+DisplayName    = %01-Hello-KMDF.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\01-Hello-KMDF.sys
+
+[01-Hello-KMDF_Device.NT.Wdf]
+KmdfService = 01-Hello-KMDF, 01-Hello-KMDF_wdfsect
+
+[01-Hello-KMDF_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+DiskName = "01-Hello-KMDF Installation Disk"
+01-Hello-KMDF.DeviceDesc = "01-Hello-KMDF Device"
+01-Hello-KMDF.SVCDESC = "01-Hello-KMDF Service"
